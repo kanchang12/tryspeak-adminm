@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="manifest" href="/manifest.json">
+    <title>AI On-boarding Alerts</title>
+    <style>
+        body { font-family: sans-serif; background: #f4f7f6; padding: 20px; }
+        .card { background: white; padding: 15px; margin-bottom: 10px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); border-left: 5px solid #11a1fd; }
+        .time { font-size: 0.8em; color: #888; }
+    </style>
+</head>
+<body>
+    <h1>On-boarding Notifications</h1>
+    <div id="notifications-list">
+        <p>Waiting for calls...</p>
+    </div>
+
+    <script>
+        const eventSource = new EventSource("/stream");
+        const list = document.getElementById('notifications-list');
+
+        eventSource.onmessage = function(event) {
+            const data = JSON.parse(event.data);
+            if (list.querySelector('p')) list.innerHTML = ''; // Clear initial message
+
+            const div = document.createElement('div');
+            div.className = 'card';
+            div.innerHTML = `
+                <div class="time">${data.time}</div>
+                <strong>ID: ${data.id}</strong>
+                <p>${data.summary}</p>
+            `;
+            list.prepend(div); // Newest on top
+        };
+    </script>
+</body>
+</html>
